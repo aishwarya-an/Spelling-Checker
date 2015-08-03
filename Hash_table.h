@@ -18,10 +18,12 @@ public:
 	Hash_table(int);
 	Hash_table(const Hash_table&);
 	const vector<string>* get_table() const;
+	int get_size() const;
+	int get_max_hash() const;
 	void insert(string);
 	int hash_function(string);
+	int hash_function2(string);
 	bool find(string);
-	void remove(string);
 	~Hash_table();
 };
 
