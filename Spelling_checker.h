@@ -16,6 +16,7 @@ private:
 public:
 	Spelling_checker(string);
 	Spelling_checker(const Spelling_checker&);
+	const Hash_table* get_dictionary() const;
 	void check(string);
 	void print_errors();
 	void suggest_words();

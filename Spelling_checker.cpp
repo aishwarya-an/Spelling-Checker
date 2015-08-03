@@ -1,6 +1,7 @@
 // This file contains the definitions of the functions of the Spelling_checker class
 
 #include <iostream>
+#include <fstream>
 #include "Spelling_checker.h"
 
 using namespace std;
@@ -15,6 +16,11 @@ Spelling_checker::Spelling_checker(string dictionary_name){
 // taken as argument.
 Spelling_checker::Spelling_checker(const Spelling_checker &another_checker){
 
+}
+
+// This function returns the pointer to the hash table storing the dictionary words.
+const Hash_table* Spelling_checker::get_dictionary() const{
+	return dictionary;
 }
 
 // This function takes in the name of a file and checks the words in the file for spelling errors. If there any words with 
