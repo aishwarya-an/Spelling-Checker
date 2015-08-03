@@ -7,15 +7,24 @@
 using namespace std;
 
 // This is the constructor which takes in a string which is the name of the file containing the dictionary and constructs a 
-// spelling checker object.
+// spelling checker object. The hash table which will store the dictionary words will be initialized to size 5000.
 Spelling_checker::Spelling_checker(string dictionary_name){
-
+	dictionary = new Hash_table(5000);
+	ifstream file;
+	file.open(dictionary_name.c_str());
+	string word;
+	while(file >> word)
+		dictionary->insert(word);
+	file.close();
+	wrong_words = new Hash_table(0);
 }
 
 // This is the copy constructor which takes another object and constructs a new object having the same contents as the object 
 // taken as argument.
 Spelling_checker::Spelling_checker(const Spelling_checker &another_checker){
-
+	const Hash_table* dictionary2 = another_checker.get_dictionary();
+	dictionary = new Hash_table(*dictionary2);
+	wrong_words = new Hash_table(0);
 }
 
 // This function returns the pointer to the hash table storing the dictionary words.
@@ -43,5 +52,6 @@ void Spelling_checker::suggest_words(){
 
 // This is the destructor which frees the memory allocated dynamically while constructing the object.
 Spelling_checker::~Spelling_checker(){
-
+	delete dictionary;
+	delete wrong_words;
 }
