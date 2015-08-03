@@ -40,7 +40,18 @@ void Spelling_checker::check(string filename){
 
 // This function prints the words with spelling errors found in the file checked. These words are stored in a private member.
 void Spelling_checker::print_errors(){
-
+	if(!wrong_words->get_size())
+		cout << "There are no errors in this file." << endl;
+	else{
+		cout << "The errors in the file are : " << endl;
+		int i = 0;
+		const vector<string>* file = wrong_words->get_table();
+		while(i < file->size()){
+			if((*file)[i] != "")
+				cout << (*file)[i] << endl;
+			++i;
+		}
+	}
 }
 
 // This function suggests new words in place of words with spelling errors. For each word with spelling error(the words are stored
@@ -53,5 +64,5 @@ void Spelling_checker::suggest_words(){
 // This is the destructor which frees the memory allocated dynamically while constructing the object.
 Spelling_checker::~Spelling_checker(){
 	delete dictionary;
-	delete wrong_words;
+	delete wrong_words;	
 }

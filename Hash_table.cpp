@@ -54,8 +54,12 @@ void Hash_table::insert(string word){
 	if(hash_value >= table->size() || size > table->size() / 2){
 		table->insert(table->end(), table->size(), "");
 	}
-	if((*table)[hash_value] == "")
+	if((*table)[hash_value] == ""){
 		(*table)[hash_value] = word;
+		++size;
+		if(hash_value > max_hash_value)
+			max_hash_value = hash_value;
+	}
 	else{
 		int i = 0;
 		int index = hash_value;
@@ -68,7 +72,12 @@ void Hash_table::insert(string word){
 			else
 				index = hash_value + i*hash_value2;
 		}
-		(*table)[index] = word;
+		if((*table)[index] == ""){
+			(*table)[index] = word;
+			++size;
+			if(index > max_hash_value)
+				max_hash_value = index;
+		}
 	}
 }
 
