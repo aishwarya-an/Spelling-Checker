@@ -58,8 +58,56 @@ void Spelling_checker::print_errors(){
 // in a private member), this function prints new words obtained by adding a new alphabet to the word or removing an alphabet 
 // from the word or exchanging two adjacent letters in the word.
 void Spelling_checker::suggest_words(){
-
+	if(!wrong_words->get_size())
+		cout << "There are no suggestions since there are no errors." << endl;
+	else{
+		cout << "The suggestions are : " << endl;
+		int i = 0;
+		const vector<string>* file = wrong_words->get_table();
+		while(i < file->size()){
+			if((*file)[i] != ""){
+				string word = (*file)[i];
+				int j = 0;
+				char letter;
+				string new_word;
+				cout << "Possible words by removing a character : " << endl;
+				while(j < word.size()){
+					new_word = word;
+					new_word.erase(new_word.begin() + j);
+					if(dictionary->find(new_word))
+						cout << new_word << " , ";
+					++j;
+				}
+				cout << endl << "Possible words by adding a character : " << endl;
+				j = 0;
+				while(j <= word.size()){
+					letter = 'a';
+					while(letter < 123){
+						new_word = word;
+						new_word.insert(new_word.begin() + i, letter);
+						if(dictionary->find(new_word))
+							cout << new_word << " , ";
+						++letter;
+					}
+					++j;
+				}
+				cout << endl << "Possible words by exchanging the adjacent characters : " << endl;
+				j = 0;
+				while(j < word.size() - 1){
+					new_word = word;
+					letter = new_word[j];
+					new_word[j] = new_word[j+1];
+					new_word[j+1] = letter;
+					if(dictionary->find(new_word))
+						cout << new_word << " , ";
+					++j;
+				}
+			}
+			++i;
+		}
+	}
 }
+
 
 // This is the destructor which frees the memory allocated dynamically while constructing the object.
 Spelling_checker::~Spelling_checker(){
