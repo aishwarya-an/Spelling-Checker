@@ -10,7 +10,7 @@ Introduction :
 A spelling checker basically takes in a file as input and checks the spelling of the words in the file. The operations performed by this library are :  
 1. Checking the spelling of the words in the file.  
 2. Printing the words with spelling errors.  
-3. In case of spelling errors, suggesting new words obtained by adding a new alphabet to the word or removing an alphabet from the word or exchanging two adjacent letters in the word.  
+3. In case of spelling errors, suggesting new words obtained by adding a new alphabet to the word or removing an alphabet from the word or exchanging two adjacent letters in the word or replacing a letter in the word by another letter.  
 
 Description of the interface :  
 -----------------------------  
@@ -37,4 +37,4 @@ Double hashing is used in case of collisions because it minimizes repeated colli
 Since, double hashing is used in case of collisions, there will not be too many free spaces in the hash table. Therefore, the memory used is theta(n) where n is the number of words in the dictionary. In case of other structures like vectors the memory used is the same as that of hash table i.e theta(n). But, the added advantage of using hash table is the time required to access the words stored.  
 Also, if a binary search tree is used to store the words from the dictionary, the memory used will be the same as that of hash table. But, the time required for access of a single word is O(log n) where n is the number of words in the dictionary. So, hash table is suitable considering both space and time complexity.  
 2. The structure used to store the words with spelling errors is also a hash table. This is because, if the words with spelling errors are repeated in the file many times it becomes easier to store the words only once. In case of other structures such as vectors, it takes O(n) time, where n is the number of words with spelling errors to check whether a word is already stored in the vector. So, totally it takes O(n^2) time, to store all such words. But, in case of hash tables, O(1) time is required to know whether a particular word has already been stored. So, it takes O(n) time to store all the words and there will not be any repetitons.   
-2. While suggesting the new words in place of the words with spelling errors, the new words are obtained by adding a new alphabet to the word or removing an alphabet from the word or exchanging two adjacent letters in the word. Other types of suggestions such as replacing a letter in the word by another letter is not included here as it is difficult to implement.  
+2. While suggesting the new words in place of the words with spelling errors, the new words are obtained by adding a new alphabet to the word or removing an alphabet from the word or exchanging two adjacent letters in the word or replacing a letter in the word by another letter.  

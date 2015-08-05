@@ -51,9 +51,10 @@ int Hash_table::get_max_hash() const{
 void Hash_table::insert(string word){
 	int hash_value = hash_function(word);
 	// Rehashes the table if the number of elements is more than half of the size of the table.
-	if(hash_value >= table->size() || size > table->size() / 2){
+	if(hash_value < 0)
+		hash_value = 0;
+	if(hash_value >= table->size() || size > table->size() / 2)
 		table->insert(table->end(), table->size(), "");
-	}
 	if((*table)[hash_value] == ""){
 		(*table)[hash_value] = word;
 		++size;
@@ -86,7 +87,10 @@ int Hash_table::hash_function(string word){
 	int i = 0;
 	int hash = 0;
 	while(i < word.size()){
-		hash = ((hash * 33) + word[i]) % 37;
+		int letter = word[i];
+		if(letter < 0)
+			letter = 0;
+		hash = ((hash * 31) + letter) % 37;
 		++i;
 	}
 	return hash;

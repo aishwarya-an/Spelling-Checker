@@ -107,7 +107,8 @@ void Spelling_checker::suggest_words(){
 				int j = 0;
 				char letter;
 				string new_word;
-				cout << "Possible words by removing a character : ";
+				cout << "Possible words are : ";
+				// Possible words by removing a letter.
 				while(j < word.size()){
 					new_word = word;
 					new_word.erase(new_word.begin() + j);
@@ -115,7 +116,7 @@ void Spelling_checker::suggest_words(){
 						cout << new_word << " , ";
 					++j;
 				}
-				cout << endl << "Possible words by adding a character : ";
+				// Possible words by adding a letter.
 				j = 0;
 				while(j <= word.size()){
 					letter = 'a';
@@ -128,7 +129,7 @@ void Spelling_checker::suggest_words(){
 					}
 					++j;
 				}
-				cout << endl << "Possible words by exchanging the adjacent characters : ";
+				// Possible words by exchanging two adjacent letters
 				j = 0;
 				while(j < word.size() - 1){
 					new_word = word;
@@ -137,6 +138,22 @@ void Spelling_checker::suggest_words(){
 					new_word[j+1] = letter;
 					if(dictionary->find(new_word))
 						cout << new_word << " , ";
+					++j;
+				}
+				// Possible words by replacing a letter with another letter.
+				j = 0;
+				while(j < word.size()){
+					new_word = word;
+					letter = 'a';
+					while(letter < 123){
+						new_word = word;
+						if(new_word[j] != letter){
+							new_word[j] = letter;
+							if(dictionary->find(new_word))
+								cout << new_word << " , ";
+						}
+						++letter;
+					}
 					++j;
 				}
 				cout << endl;
