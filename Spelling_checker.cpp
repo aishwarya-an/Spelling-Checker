@@ -13,8 +13,10 @@ Spelling_checker::Spelling_checker(string dictionary_name){
 	ifstream file;
 	file.open(dictionary_name.c_str());
 	string word;
-	while(file >> word)
+	while(file >> word){
+		word = to_lowercase(word);
 		dictionary->insert(word);
+	}
 	file.close();
 	wrong_words = new Hash_table(0);
 }
@@ -32,10 +34,21 @@ const Hash_table* Spelling_checker::get_dictionary() const{
 	return dictionary;
 }
 
+// This function takes in a string and changes all the letters in the string to lowercase and returns the string in lowercase.
+string Spelling_checker::to_lowercase(string word){
+	int i = 0;
+	while(i < word.size()){
+		if(!islower(word[i]))
+			word[i] = tolower(word[i]);
+		++i;
+	}
+	return word;
+}
+
 // This function takes in the name of a file and checks the words in the file for spelling errors. If there any words with 
 // spelling errors, then it stores those words in the hash table meant for it.
 void Spelling_checker::check(string filename){
-
+	
 }
 
 // This function prints the words with spelling errors found in the file checked. These words are stored in a private member.
@@ -67,6 +80,7 @@ void Spelling_checker::suggest_words(){
 		while(i < file->size()){
 			if((*file)[i] != ""){
 				string word = (*file)[i];
+				cout << "For the word : " << word << endl;
 				int j = 0;
 				char letter;
 				string new_word;
@@ -84,7 +98,7 @@ void Spelling_checker::suggest_words(){
 					letter = 'a';
 					while(letter < 123){
 						new_word = word;
-						new_word.insert(new_word.begin() + i, letter);
+						new_word.insert(new_word.begin() + j, letter);
 						if(dictionary->find(new_word))
 							cout << new_word << " , ";
 						++letter;

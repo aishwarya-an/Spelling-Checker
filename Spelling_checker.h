@@ -17,6 +17,7 @@ public:
 	Spelling_checker(string);
 	Spelling_checker(const Spelling_checker&);
 	const Hash_table* get_dictionary() const;
+	string to_lowercase(string);
 	void check(string);
 	void print_errors();
 	void suggest_words();
