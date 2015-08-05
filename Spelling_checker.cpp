@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cctype>
 #include "Spelling_checker.h"
 
 using namespace std;
@@ -48,7 +49,29 @@ string Spelling_checker::to_lowercase(string word){
 // This function takes in the name of a file and checks the words in the file for spelling errors. If there any words with 
 // spelling errors, then it stores those words in the hash table meant for it.
 void Spelling_checker::check(string filename){
-	
+	ifstream file;
+	file.open(filename.c_str());
+	string word;
+	while(file >> word){
+		word = to_lowercase(word);
+		// If there any symbols like .,"{( at the end of the word, then remove it.
+		if((word[word.size()-1] >= 33 && word[word.size()-1] <= 47) || (word[word.size()-1] >= 58 && word[word.size()-1] <= 63) ||
+		 (word[word.size()-1] >= 91 && word[word.size()-1] <= 96) || (word[word.size()-1] >= 123 && word[word.size()-1] <= 126)){
+			word.erase(word.end() - 1);
+			// If the word originally contained two symbols at the end of it (like the word wished." ), removing the symbols.
+			if((word[word.size()-1] >= 33 && word[word.size()-1] <= 47) || (word[word.size()-1] >= 58 && word[word.size()-1] <= 63) ||
+		 	(word[word.size()-1] >= 91 && word[word.size()-1] <= 96) || (word[word.size()-1] >= 123 && word[word.size()-1] <= 126))
+				word.erase(word.end() - 1);
+		}
+		// If the word contained any symbols at the beginning of the word, removing it.
+		if((word[0] >= 33 && word[0] <= 47) || (word[0] >= 58 && word[0] <= 63) ||(word[0] >= 91 && word[0] <= 96) || (word[0] >= 123 && word[0] <= 126)){
+			word.erase(word.begin());
+			if((word[0] >= 33 && word[0] <= 47) || (word[0] >= 58 && word[0] <= 63) ||(word[0] >= 91 && word[0] <= 96) || (word[0] >= 123 && word[0] <= 126))
+				word.erase(word.begin());
+		}
+		if(!dictionary->find(word))
+			wrong_words->insert(word);
+	}
 }
 
 // This function prints the words with spelling errors found in the file checked. These words are stored in a private member.
@@ -80,11 +103,11 @@ void Spelling_checker::suggest_words(){
 		while(i < file->size()){
 			if((*file)[i] != ""){
 				string word = (*file)[i];
-				cout << "For the word : " << word << endl;
+				cout << endl << "For the word : " << word << endl;
 				int j = 0;
 				char letter;
 				string new_word;
-				cout << "Possible words by removing a character : " << endl;
+				cout << "Possible words by removing a character : ";
 				while(j < word.size()){
 					new_word = word;
 					new_word.erase(new_word.begin() + j);
@@ -92,7 +115,7 @@ void Spelling_checker::suggest_words(){
 						cout << new_word << " , ";
 					++j;
 				}
-				cout << endl << "Possible words by adding a character : " << endl;
+				cout << endl << "Possible words by adding a character : ";
 				j = 0;
 				while(j <= word.size()){
 					letter = 'a';
@@ -105,7 +128,7 @@ void Spelling_checker::suggest_words(){
 					}
 					++j;
 				}
-				cout << endl << "Possible words by exchanging the adjacent characters : " << endl;
+				cout << endl << "Possible words by exchanging the adjacent characters : ";
 				j = 0;
 				while(j < word.size() - 1){
 					new_word = word;
@@ -116,6 +139,7 @@ void Spelling_checker::suggest_words(){
 						cout << new_word << " , ";
 					++j;
 				}
+				cout << endl;
 			}
 			++i;
 		}
