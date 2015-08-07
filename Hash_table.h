@@ -11,15 +11,13 @@ using namespace std;
 
 class Hash_table{
 private:
-	vector<string>* table;
+	vector<vector<string>* >* table;
 	int size;
-	int max_hash_value;
 public:
 	Hash_table(int);
 	Hash_table(const Hash_table&);
-	const vector<string>* get_table() const;
+	const vector<vector<string>* >* get_table() const;
 	int get_size() const;
-	int get_max_hash() const;
 	void insert(string);
 	int hash_function(string);
 	int hash_function2(string);

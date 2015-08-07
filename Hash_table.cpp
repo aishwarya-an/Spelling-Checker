@@ -1,5 +1,9 @@
 // This file contains the definition of the functions of the Hash_table class
 
+/* The hash table uses perfect hashing i.e it uses a secondary hash table for each slot in the hash table. This will reduce
+the number of collisions and most importantly will reduce the time to access a word to O(1) time in the worst case.
+*/
+
 #include <iostream>
 #include "Hash_table.h"
 
@@ -9,30 +13,28 @@ using namespace std;
 // given is less than 50, then it creates the hash table of size 50.
 Hash_table::Hash_table(int num_of_elements){
 	if(num_of_elements < 50)
-		table = new vector<string>(50, "");
+		table = new vector<vector<string>* >(50);
 	else
-		table = new vector<string>(num_of_elements + 1, "");
+		table = new vector<vector<string>* >(num_of_elements + 1);
+	int i = 0;
+	while(i < table->size()){
+		(*table)[i] = new vector<string>();
+		++i;
+	}
 	size = 0; 												// size represents the number of elements or words in the hash table
-	max_hash_value = 0;
 }
 
 // This is the copy constructor which takes in an object of the class and constructs a new object with the same contents of the 
 // object passed as argument.
 Hash_table::Hash_table(const Hash_table &another_table){
-	const vector<string>* table2 = another_table.get_table();
+	const vector<vector<string>* >* table2 = another_table.get_table();
 	size = another_table.get_size();
-	table = new vector<string>(table2->size());
-	int i = 0;
-	while(i < table2->size()){
-		(*table)[i] = (*table2)[i];
-		++i;
-	}
-	max_hash_value = another_table.get_max_hash();
+	table = new vector<vector<string>* >(*table2);
 }
 
 // This function returns the pointer to the vector which contains the words stored in the hash table. Since the vector returned 
 // is a private member, it is returned as const.
-const vector<string>* Hash_table::get_table() const{
+const vector<vector<string>* >* Hash_table::get_table() const{
 	return table;
 }
 
@@ -41,44 +43,31 @@ int Hash_table::get_size() const{
 	return size;
 }
 
-// This function returns the maximum index which has an element in it.
-int Hash_table::get_max_hash() const{
-	return max_hash_value;
-}
 
-// This function takes in a string and inserts the same into the hash table. If required, it re-sizes the hash table and inserts 
-// the word. 
+// This function takes in a string and inserts the same into the hash table. It first goes to the slot given by the 
+// hash_function() and then inserts the word in the secondary hash table pointed to by the slot. If the secondary hash
+// table is empty, it first creates a hash table of size 11 and then inserts the word into the secondary table.
 void Hash_table::insert(string word){
 	int hash_value = hash_function(word);
-	// Rehashes the table if the number of elements is more than half of the size of the table.
-	if(hash_value < 0)
-		hash_value = 0;
-	if(hash_value >= table->size() || size > table->size() / 2)
-		table->insert(table->end(), table->size(), "");
-	if((*table)[hash_value] == ""){
-		(*table)[hash_value] = word;
+	int hash_value2 = hash_function2(word);
+	vector<string>* current = (*table)[hash_value];
+	// Resizing the secondary hash table if it is empty.
+	if(current->size() == 0)
+		current->resize(11, "");
+	if((*current)[hash_value2] == ""){
+		(*current)[hash_value2] = word;
 		++size;
-		if(hash_value > max_hash_value)
-			max_hash_value = hash_value;
 	}
+	// If there is a collision in the secondary hash table.
 	else{
-		int i = 0;
-		int index = hash_value;
-		int hash_value2 = hash_function2(word);
-		// Uses the method of double hashing
-		while((*table)[index] != "" && (*table)[index] != word){
-			++i;
-			if(hash_value + i*hash_value2 >= table->size())
-				index = (hash_value + i*hash_value2) % table->size();
-			else
-				index = hash_value + i*hash_value2;
+		int index = hash_value2;
+		while((*current)[index] != "" && (*current)[index] != word){
+			++index;
+			if(index >= 11)
+				index = index % 11;
 		}
-		if((*table)[index] == ""){
-			(*table)[index] = word;
-			++size;
-			if(index > max_hash_value)
-				max_hash_value = index;
-		}
+		++size;
+		(*current)[index] = word;
 	}
 }
 
@@ -90,48 +79,44 @@ int Hash_table::hash_function(string word){
 		int letter = word[i];
 		if(letter < 0)
 			letter = 0;
-		hash = ((hash * 31) + letter) % 37;
+		hash = ((hash << 5) + hash + letter) % table->size();
 		++i;
 	}
 	return hash;
 }
 
-// This function is another hash function used for double hashing. It takes in the string and computes the hash value and 
-// returns the same.
+// This function is another hash function used for inserting the word into the secondary hash table. It takes in the string 
+// and computes the hash value and returns the same.
 int Hash_table::hash_function2(string word){
 	int i = 0;
 	int hash = 0;
 	while(i < word.size()){
-		hash = (hash * 29) + word[i];
+		hash = ((hash * 31) + word[i]) % 11;
 		++i;
 	}
-	return 31 - (hash % 31); 
+	return hash; 
 }
-
 
 // This function takes in a string and returns whether the string is present in the hash table or not.
 bool Hash_table::find(string word){
 	int hash_value = hash_function(word);
-	if(hash_value > max_hash_value)
+	// Going to the scondary hash table pointed to by the slot given by the above hash value.
+	vector<string>* current = (*table)[hash_value];
+	// If the secondary hash table is of size 0, then there is no such word in the dictionary.
+	if(current->size() == 0)
+		return false;
+	// If the secondary hash table is not of size 0, then getting the slot number where the word is placed.
+	int hash_value2 = hash_function2(word);
+	if((*current)[hash_value2] == "")
 		return false;
 	else{
-		if((*table)[hash_value] == "")
-			return false;
-		else if((*table)[hash_value] == word)
-			return true;
-		else{
-			int i = 0;
-			int index = hash_value;
-			int hash_value2 = hash_function2(word);
-			while((*table)[index] != "" && (*table)[index] != word){
-				++i;
-				if(hash_value + i*hash_value2 >= table->size())
-					index = (hash_value + i*hash_value2) % table->size();
-				else
-					index = hash_value + i*hash_value2;
-			}
-			return ((*table)[index] != "");
+		int index = hash_value2;
+		while((*current)[index] != "" && (*current)[index] != word){
+			++index;
+			if(index >= 11)
+				index = index % 11;
 		}
+		return (*current)[index] != "";
 	}
 }
 

@@ -8,18 +8,21 @@
 using namespace std;
 
 // This is the constructor which takes in a string which is the name of the file containing the dictionary and constructs a 
-// spelling checker object. The hash table which will store the dictionary words will be initialized to size 5000.
+// spelling checker object. The dictionary should have its first line as the number of words in the dictionary. The size of
+// the hash table is the number of words in the dictionary.
 Spelling_checker::Spelling_checker(string dictionary_name){
-	dictionary = new Hash_table(5000);
 	ifstream file;
 	file.open(dictionary_name.c_str());
+	int size;
+	file >> size;
+	dictionary = new Hash_table(size);
 	string word;
 	while(file >> word){
 		word = to_lowercase(word);
 		dictionary->insert(word);
 	}
 	file.close();
-	wrong_words = new Hash_table(0);
+	wrong_words = new Hash_table(100);
 }
 
 // This is the copy constructor which takes another object and constructs a new object having the same contents as the object 
@@ -27,8 +30,9 @@ Spelling_checker::Spelling_checker(string dictionary_name){
 Spelling_checker::Spelling_checker(const Spelling_checker &another_checker){
 	const Hash_table* dictionary2 = another_checker.get_dictionary();
 	dictionary = new Hash_table(*dictionary2);
-	wrong_words = new Hash_table(0);
+	wrong_words = new Hash_table(100);
 }
+
 
 // This function returns the pointer to the hash table storing the dictionary words.
 const Hash_table* Spelling_checker::get_dictionary() const{
@@ -79,12 +83,17 @@ void Spelling_checker::print_errors(){
 	if(!wrong_words->get_size())
 		cout << "There are no errors in this file." << endl;
 	else{
-		cout << "The errors in the file are : " << endl;
+		cout << endl << "The errors in the file are : " << endl;
 		int i = 0;
-		const vector<string>* file = wrong_words->get_table();
+		const vector<vector<string>* >* file = wrong_words->get_table();
 		while(i < file->size()){
-			if((*file)[i] != "")
-				cout << (*file)[i] << endl;
+			vector<string>* second = (*file)[i];
+			int j = 0;
+			while(j < second->size()){
+				if((*second)[j] != "")
+					cout << (*second)[j] << endl;
+				++j;
+			}
 			++i;
 		}
 	}
@@ -97,66 +106,71 @@ void Spelling_checker::suggest_words(){
 	if(!wrong_words->get_size())
 		cout << "There are no suggestions since there are no errors." << endl;
 	else{
-		cout << "The suggestions are : " << endl;
+		cout << endl << "The suggestions are : " << endl;
 		int i = 0;
-		const vector<string>* file = wrong_words->get_table();
+		const vector<vector<string>* >* file = wrong_words->get_table();
 		while(i < file->size()){
-			if((*file)[i] != ""){
-				string word = (*file)[i];
-				cout << endl << "For the word : " << word << endl;
-				int j = 0;
-				char letter;
-				string new_word;
-				cout << "Possible words are : ";
-				// Possible words by removing a letter.
-				while(j < word.size()){
-					new_word = word;
-					new_word.erase(new_word.begin() + j);
-					if(dictionary->find(new_word))
-						cout << new_word << " , ";
-					++j;
-				}
-				// Possible words by adding a letter.
-				j = 0;
-				while(j <= word.size()){
-					letter = 'a';
-					while(letter < 123){
+			vector<string>* second = (*file)[i];
+			int a = 0;
+			while(a < second->size()){
+				if((*second)[a] != ""){
+					string word = (*second)[a];
+					cout << endl << "For the word : " << word << endl;
+					int j = 0;
+					char letter;
+					string new_word;
+					cout << "Possible words are : ";
+					// Possible words by removing a letter.
+					while(j < word.size()){
 						new_word = word;
-						new_word.insert(new_word.begin() + j, letter);
+						new_word.erase(new_word.begin() + j);
 						if(dictionary->find(new_word))
 							cout << new_word << " , ";
-						++letter;
+						++j;
 					}
-					++j;
-				}
-				// Possible words by exchanging two adjacent letters
-				j = 0;
-				while(j < word.size() - 1){
-					new_word = word;
-					letter = new_word[j];
-					new_word[j] = new_word[j+1];
-					new_word[j+1] = letter;
-					if(dictionary->find(new_word))
-						cout << new_word << " , ";
-					++j;
-				}
-				// Possible words by replacing a letter with another letter.
-				j = 0;
-				while(j < word.size()){
-					new_word = word;
-					letter = 'a';
-					while(letter < 123){
-						new_word = word;
-						if(new_word[j] != letter){
-							new_word[j] = letter;
+					// Possible words by adding a letter.
+					j = 0;
+					while(j <= word.size()){
+						letter = 'a';
+						while(letter < 123){
+							new_word = word;
+							new_word.insert(new_word.begin() + j, letter);
 							if(dictionary->find(new_word))
 								cout << new_word << " , ";
+							++letter;
 						}
-						++letter;
+						++j;
 					}
-					++j;
+					// Possible words by exchanging two adjacent letters
+					j = 0;
+					while(j < word.size() - 1){
+						new_word = word;
+						letter = new_word[j];
+						new_word[j] = new_word[j+1];
+						new_word[j+1] = letter;
+						if(dictionary->find(new_word))
+							cout << new_word << " , ";
+						++j;
+					}
+					// Possible words by replacing a letter with another letter.
+					j = 0;
+					while(j < word.size()){
+						new_word = word;
+						letter = 'a';
+						while(letter < 123){
+							new_word = word;
+							if(new_word[j] != letter){
+								new_word[j] = letter;
+								if(dictionary->find(new_word))
+									cout << new_word << " , ";
+							}
+							++letter;
+						}
+						++j;
+					}
+					cout << endl;
 				}
-				cout << endl;
+				++a;
 			}
 			++i;
 		}
