@@ -21,6 +21,13 @@ Hash_table::Hash_table(int num_of_elements){
 		(*table)[i] = new vector<string>();
 		++i;
 	}
+	// The size of the secondary table is decided on the basis of the number of elements in the hash table. If the number of 
+	// elements is <= 300000, then the number of collisons will be low. So, the size of the secondary table will be 11.
+	// Else, the size of the secondary table will be 53.
+	if(num_of_elements <= 300000)
+		secondary_table_size = 11;
+	else
+		secondary_table_size = 53;
 	size = 0; 												// size represents the number of elements or words in the hash table
 }
 
@@ -53,7 +60,7 @@ void Hash_table::insert(string word){
 	vector<string>* current = (*table)[hash_value];
 	// Resizing the secondary hash table if it is empty.
 	if(current->size() == 0)
-		current->resize(11, "");
+		current->resize(secondary_table_size, "");
 	if((*current)[hash_value2] == ""){
 		(*current)[hash_value2] = word;
 		++size;
@@ -63,8 +70,8 @@ void Hash_table::insert(string word){
 		int index = hash_value2;
 		while((*current)[index] != "" && (*current)[index] != word){
 			++index;
-			if(index >= 11)
-				index = index % 11;
+			if(index >= secondary_table_size)
+				index = index % secondary_table_size;
 		}
 		++size;
 		(*current)[index] = word;
@@ -91,7 +98,7 @@ int Hash_table::hash_function2(string word){
 	int i = 0;
 	int hash = 0;
 	while(i < word.size()){
-		hash = ((hash * 31) + word[i]) % 11;
+		hash = ((hash * 31) + word[i]) % secondary_table_size;
 		++i;
 	}
 	return hash; 
@@ -113,8 +120,8 @@ bool Hash_table::find(string word){
 		int index = hash_value2;
 		while((*current)[index] != "" && (*current)[index] != word){
 			++index;
-			if(index >= 11)
-				index = index % 11;
+			if(index >= secondary_table_size)
+				index = index % secondary_table_size;
 		}
 		return (*current)[index] != "";
 	}

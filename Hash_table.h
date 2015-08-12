@@ -13,6 +13,7 @@ class Hash_table{
 private:
 	vector<vector<string>* >* table;
 	int size;
+	int secondary_table_size;
 public:
 	Hash_table(int);
 	Hash_table(const Hash_table&);
